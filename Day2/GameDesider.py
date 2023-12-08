@@ -33,6 +33,3 @@ for str in input:
     gameNr = int(checkImposableGame(str))
     sum = sum + gameNr
 print(sum)
-
-2354
-2696
