@@ -1,6 +1,3 @@
-// C++ program to display "Hello World"
- 
-// Header file for input output functions
 #include <iostream>
 #include <fstream>
 using namespace std;
