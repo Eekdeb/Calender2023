@@ -1,50 +1,61 @@
 #include <iostream>
 #include <fstream>
-#include <list>
-#include <stdio.h>
+#include <vector>
+#include <sstream>
 
 using namespace std;
 
+vector<vector<int>> getMatrix(fstream& in){
+    vector<vector<int>> matrix;
+    vector<int> tempV;
+    string nr1s;
+    int nr1,nr2,nr3;
+    int count = 0;
+    while(in >> nr1s)
+    {
+        if(nr1s.find("to") != string::npos) break;
+        nr1 = stoi(nr1s);
+        in >> nr2;
+        in >> nr3; 
+        tempV.push_back(nr1);
+        tempV.push_back(nr2);
+        tempV.push_back(nr3);
+        matrix.push_back(tempV);
+        tempV.clear();
+    }
+    return matrix;
+}
+
 int main(){
     
-    ifstream InputFile("exampleInput.txt");
+    fstream input ("exampleInput.txt");    
+    input.ignore(256,' ');
+
+    vector<int> seeds;
+    string buff;
+    stringstream buffStream;
+    int seed;
+    getline(input,buff);
+    buffStream.str(buff);
     
-    FILE *fp;
-    /*
-    if ((fptr = fopen("exampleInput.txt","rb")) == NULL){
-        printf("Error! opening file");
-        // Program exits if the file pointer returns NULL.
-        exit(1);
-    }*/
-    char name[8];
-    int seeds[10];
-    int numbers[3];
-    fp = fopen("exampleInput.txt","r");
-    fscanf(fp, "%s %d %d %d %d", name, &seeds[0],&seeds[1],&seeds[2],&seeds[3]);
-    fscanf(fp,"%*s %*s");
-    cout << name << "  " << seeds[0] << "  " << seeds[1] << "  " << seeds[2]  << "  " <<seeds[3];
-
-
-    fscanf(fp,"%d %d %d",&numbers[0],&numbers[1],&numbers[2]);
-    cout << "Numbers: " << numbers[0] << "  " << numbers[1] << "  " << numbers[2];
-
-    fclose(fp);
-    /*
-    string lineFromFile;
-    //Get seeds
-    while(getline(InputFile, lineFromFile)) {
-        int a;
-        lineFromFile = lineFromFile.substr();
-        cout << lineFromFile << "\n";
-        if(lineFromFile.length() == 1)
-            break;
+    while(!buffStream.eof()){
+        buffStream >> seed;
+        seeds.push_back(seed);
     }
+    input.ignore(256,':');
+    input.ignore(256,'\n');
 
-    while(getline(InputFile, lineFromFile)) {
-        cout << lineFromFile << "\n";
-        if(lineFromFile.length() == 1)
-            break;
-    }
-    */
-   return 0;
+    vector<vector<int>> seedToSoil;
+    seedToSoil = getMatrix(input);
+    cout << seedToSoil[1][1] << endl;
+    input.ignore(256,'\n');
+
+    vector<vector<int>> soilToSome;
+    soilToSome = getMatrix(input);
+    cout << soilToSome[0][0] << " " << soilToSome[0][1] << " " << soilToSome[0][2] << endl;
+    cout << soilToSome[1][0] << " " << soilToSome[1][1] << " " << soilToSome[1][2] << endl;
+    cout << soilToSome[2][0] << " " << soilToSome[2][1] << " " << soilToSome[2][2] << endl;
+
+    input.close();
+    return 0;
 }
