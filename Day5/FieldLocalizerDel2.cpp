@@ -113,6 +113,7 @@ int main(){
     bool seedFound1 = false, seedFound2 = false, seedFound3 = false;
     long long value;
     long long count = 0;
+    int addThis = 10000000;
     while(true){
         value = convertValue(count,humidityToLocation);
         value = convertValue(value,temperatureToHumidity);
@@ -123,40 +124,17 @@ int main(){
         value = convertValue(value,seedToSoil);
 
         if(existingSeed(value,seeds)){
-            if(!seedFound1){
-                seedFound1 = true;
-                count = count - 1000000;
-            }
-            else if(!seedFound2){
-                seedFound2 = true;
-                count = count - 10000;
-            }
-            else if (!seedFound3){
-                seedFound3 = true;
-                count = count - 100;
-            }
-            else{
+            if(addThis == 1){
                 break;
             }
+            count -= addThis;
+            addThis = addThis/10;
         }
 
-        if(!seedFound1){
-            count = count + 1000000;
-        }
-        else if(!seedFound2){
-            count = count + 10000;
-        }
-        else if (!seedFound3)
-        {
-            count = count + 100;
-        }
-        else
-        {
-            count++;
-        }        
+        count += addThis;
         cout << count << endl;
     } 
-    cout << count;
+    cout << "The spot to plant next is: " << count;
 
     input.close();
     return 0;
