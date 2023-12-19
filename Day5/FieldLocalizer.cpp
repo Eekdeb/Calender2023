@@ -5,16 +5,16 @@
 
 using namespace std;
 
-vector<vector<int>> getMatrix(fstream& in){
-    vector<vector<int>> matrix;
-    vector<int> tempV;
+vector<vector<long long>> getMatrix(fstream& in){
+    vector<vector<long long>> matrix;
+    vector<long long> tempV;
     string nr1s;
-    int nr1,nr2,nr3;
+    long long nr1,nr2,nr3;
     int count = 0;
     while(in >> nr1s)
     {
         if(nr1s.find("to") != string::npos) break;
-        nr1 = stoi(nr1s);
+        nr1 = stoll(nr1s);
         in >> nr2;
         in >> nr3; 
         tempV.push_back(nr1);
@@ -26,15 +26,28 @@ vector<vector<int>> getMatrix(fstream& in){
     return matrix;
 }
 
+long long getNewValue(long long seed, vector<vector<long long>> sdr){
+    for(auto& row : sdr){
+        long long source = row[1];
+        long long destination = row[0];
+        long long range = row[2];
+        if(seed >= source && seed < source + range){
+            //cout << "source: " << source << " dest: " << destination << " range: " << range << endl;
+            return seed - source + destination;
+        }
+    }
+    return seed;
+}
+
 int main(){
     
-    fstream input ("exampleInput.txt");    
+    fstream input ("input.txt");    
     input.ignore(256,' ');
 
-    vector<int> seeds;
+    vector<long long> seeds;
     string buff;
     stringstream buffStream;
-    int seed;
+    long long seed;
     getline(input,buff);
     buffStream.str(buff);
     
@@ -45,17 +58,59 @@ int main(){
     input.ignore(256,':');
     input.ignore(256,'\n');
 
-    vector<vector<int>> seedToSoil;
+    vector<vector<long long>> seedToSoil;
     seedToSoil = getMatrix(input);
-    cout << seedToSoil[1][1] << endl;
     input.ignore(256,'\n');
 
-    vector<vector<int>> soilToSome;
-    soilToSome = getMatrix(input);
-    cout << soilToSome[0][0] << " " << soilToSome[0][1] << " " << soilToSome[0][2] << endl;
-    cout << soilToSome[1][0] << " " << soilToSome[1][1] << " " << soilToSome[1][2] << endl;
-    cout << soilToSome[2][0] << " " << soilToSome[2][1] << " " << soilToSome[2][2] << endl;
+    vector<vector<long long>> soilToFertilizer;
+    soilToFertilizer = getMatrix(input);
+    input.ignore(256,'\n');
 
+    vector<vector<long long>> fertilizerToWater;
+    fertilizerToWater = getMatrix(input);
+    input.ignore(256,'\n');
+
+    vector<vector<long long>> waterToLight;
+    waterToLight = getMatrix(input);
+    input.ignore(256,'\n');
+
+    vector<vector<long long>> lightToTemperature;
+    lightToTemperature = getMatrix(input);
+    input.ignore(256,'\n');
+
+    vector<vector<long long>> temperatureToHumidity;
+    temperatureToHumidity = getMatrix(input);
+    input.ignore(256,'\n');
+
+    vector<vector<long long>> humidityToLocation;
+    humidityToLocation = getMatrix(input);
+    input.ignore(256,'\n');
+
+
+    long long lowestLocation = 9999999999;
+    //change Location
+    for (int i = 0; i < seeds.size(); i++)
+    {
+        seed = seeds[i];
+        seed = getNewValue(seed,seedToSoil);
+        //cout << seed; << " ";
+        seed = getNewValue(seed,soilToFertilizer);
+        //cout << seed << " ";
+        seed = getNewValue(seed,fertilizerToWater);
+        //cout << seed << " ";
+        seed = getNewValue(seed,waterToLight);
+        //cout << seed << " ";
+        seed = getNewValue(seed,lightToTemperature);
+        //cout << seed << " ";
+        seed = getNewValue(seed,temperatureToHumidity);
+        //cout << seed << " ";
+        seed = getNewValue(seed,humidityToLocation);
+        //cout << seed << endl;  
+        if(seed < lowestLocation){
+            lowestLocation = seed;
+        }  
+    }
+    cout << "plant at location " << lowestLocation;
     input.close();
     return 0;
 }
