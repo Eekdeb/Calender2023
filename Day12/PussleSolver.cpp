@@ -111,7 +111,7 @@ int main(){
     vector<int> numbers;
     int combos = 0;
     
-    //getInputFromLine("?.?#.????# 1,2,2",code,numbers);
+    //getInputFromLine("?#????????????##?? 1,1,10",code,numbers);
     //findPlaces(code,0,numbers,0,combos);
 
     
@@ -122,7 +122,7 @@ int main(){
         getInputFromLine(buff,code,numbers);
         prevcom = combos;
         findPlaces(code,0,numbers,0,combos);
-        //cout << code << " " << combos-prevcom << endl;
+        cout << code << " " << combos-prevcom << endl;
     }
     
     
