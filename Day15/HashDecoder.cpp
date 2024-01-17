@@ -20,11 +20,9 @@ int main(){
     std::fstream input("example.txt");
     std::string buff;
     int res = 0, total = 0;
-    int count = 0;
-    cout << hashMath("HASH") << endl;
+    
     while (!input.eof())
     {
-        count++;
         std::getline(input,buff,',');
         res = hashMath(buff);
         //cout << res << " " << buff << endl;
