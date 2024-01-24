@@ -1,0 +1,18 @@
+Get from A to B with least emaount of heat
+
+X413
+3215
+3255
+
+Starting att top left give value to next space. Then take the smallest value and continue from that point.
+Example
+Step1   Step2   Step3   Step4   Step5   Step6   Step7
+X4--    X4--    X45-    X458    X458    X458    X458
+3---    35--    35--    356-    356(11) 356(11) 356(11)
+----    6---    6---    6---    6-(11)- 67(11)- 67(11)(16)
+
+Then the answer is 16.
+For the additional rule that you cant move straight for more than 3 we can have a counter that tells how many
+moves are done in one direction.
+
+
