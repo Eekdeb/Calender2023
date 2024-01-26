@@ -16,3 +16,22 @@ For the additional rule that you cant move straight for more than 3 we can have 
 moves are done in one direction.
 
 
+When just adding the rule some paths are missed becouse it is posible to make a more expensive
+step to get less expensive in the future.
+
+To negate this a offsett can be sett so that you can take an unoptimal rout in but still test if
+it it better in the future. The problem is it takes way more time to do so.
+
+To minimize time los instead of sorting the list every time have a sorted list and add new items
+sorted. But it is not enough. 
+
+There are to many nodes to search so maybe if you can take away some nodes then the code
+would be much faster. But how to take away only those that are not needed.
+
+I tested to take away all the biggest numbers after a sertain time but that is not good because
+all numbers grow and the biggest will be the smallest eventually.
+
+I will test to take away the one with the least amount of steps after some time.
+It is posable to take away the best outcome but i think that is in special cases and
+this can be used in most cases. Lets try. Problem with this is that it does not know where 
+to go so it can travel up and down and around and will be rewarded for this and not be removed.
