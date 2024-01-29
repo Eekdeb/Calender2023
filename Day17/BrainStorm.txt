@@ -35,3 +35,25 @@ I will test to take away the one with the least amount of steps after some time.
 It is posable to take away the best outcome but i think that is in special cases and
 this can be used in most cases. Lets try. Problem with this is that it does not know where 
 to go so it can travel up and down and around and will be rewarded for this and not be removed.
+
+I want to check the distance to the end instead and take away those that are far away.
+The distance in this case is as big of a number as possible in both row and col. so
+will be calculated as row+col.
+The distance in this case will be  dest.row-pos.row + dest.col-pos.col
+
+I learned that heap is way faster than a priority queue so i will test the first implementation with
+a heap instead. (Found out that HEAPS are much more efficient)
+
+note if dist not working then tests with a combination of dist,nrofsteps,value.
+
+I did the algorithm wrong. I will try again but without another map. Then i think it will work. But the heap
+thing is still super good to use.
+
+I got part  1 to work. What i did wrong is how the visited locations where stored.
+U had only position to begin with but what makes a unique node is position, direction and
+nrOfSteps in this direction. 
+I have two ways to improve myself after i learned this.
+1. I could do more reasursh before starting. The drawback is that I don't want to
+    look for other answer before i try to solv it without "googling"
+2. Make a visual representation of what i want to code and therfor get a better understanding
+    of how to implement what i invision. Also easer to explain to others.

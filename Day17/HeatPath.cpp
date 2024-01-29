@@ -17,12 +17,14 @@ struct LEAF
     int downCount;
     int leftCount;
     int nrOfSteps;
-    bool operator() (LEAF i,LEAF j) { return (i.value<j.value);}
+    bool operator() (LEAF i,LEAF j) { return (i.value>j.value);}
 } leaf;
 
 void insetSort(vector<LEAF>& vec, LEAF ins);
 
 bool stepsSort(LEAF i, LEAF j) {return (i.nrOfSteps < j.nrOfSteps);}
+
+bool distSort(LEAF i, LEAF j) {return ((i.row+i.col) < (j.row+j.col));}
 
 void getMap(fstream& input, vector<vector<int>>& map){
     string buff;
@@ -76,10 +78,10 @@ void outMap(vector<vector<int>> map, ofstream& out){
 }
 
 void updateLeaf(vector<LEAF>& leafs, vector<vector<int>> map, vector<vector<int>>& pathMap){
-    LEAF origin = leafs[0], newl;
+    LEAF origin = leafs.front(), newl;
     int ofsett = 3;
     //right
-    if(origin.col != map[0].size()-1){
+    if(origin.col != map[0].size()-1 && origin.leftCount == 0){
         newl = {
             origin.row,
             origin.col+1,
@@ -87,13 +89,13 @@ void updateLeaf(vector<LEAF>& leafs, vector<vector<int>> map, vector<vector<int>
             0,origin.rightCount +1,0,0,origin.nrOfSteps+1
             };
         if(newl.value - ofsett <= pathMap[origin.row][origin.col+1] && newl.rightCount <= 3){
-            insetSort(leafs,newl);
+            leafs.push_back(newl); push_heap(leafs.begin(),leafs.end(),leaf);
             if(newl.value < pathMap[origin.row][origin.col+1])
                 pathMap[origin.row][origin.col+1] = newl.value;
         }
     }
     //Left
-    if(origin.col != 0){
+    if(origin.col != 0 && origin.rightCount == 0){
         newl = {
             origin.row,
             origin.col-1,
@@ -101,13 +103,13 @@ void updateLeaf(vector<LEAF>& leafs, vector<vector<int>> map, vector<vector<int>
             0,0,0,origin.leftCount+1,origin.nrOfSteps+1
             };
         if(newl.value - ofsett <= pathMap[origin.row][origin.col-1] && newl.leftCount <= 3){
-            insetSort(leafs,newl);
+            leafs.push_back(newl); push_heap(leafs.begin(),leafs.end(),leaf);
             if(newl.value < pathMap[origin.row][origin.col-1])
                 pathMap[origin.row][origin.col-1] = newl.value;
         }
     }
     //Down
-    if(origin.row != map.size()-1){
+    if(origin.row != map.size()-1 && origin.uppCount == 0){
         newl = {
             origin.row+1,
             origin.col,
@@ -115,13 +117,13 @@ void updateLeaf(vector<LEAF>& leafs, vector<vector<int>> map, vector<vector<int>
             0,0,origin.downCount+1,0,origin.nrOfSteps+1
             };
         if(newl.value - ofsett <= pathMap[origin.row+1][origin.col] && newl.downCount <= 3){
-            insetSort(leafs,newl);
+            leafs.push_back(newl); push_heap(leafs.begin(),leafs.end(),leaf);
             if(newl.value < pathMap[origin.row+1][origin.col])
                 pathMap[origin.row+1][origin.col] = newl.value;
         }
     }
     //Upp
-    if(origin.row != 0){
+    if(origin.row != 0 && origin.downCount == 0){
         newl = {
             origin.row-1,
             origin.col,
@@ -129,7 +131,7 @@ void updateLeaf(vector<LEAF>& leafs, vector<vector<int>> map, vector<vector<int>
             origin.uppCount+1,0,0,0,origin.nrOfSteps+1
             };
         if(newl.value - ofsett <= pathMap[origin.row-1][origin.col] && newl.uppCount <= 3){
-            insetSort(leafs,newl);
+            leafs.push_back(newl); push_heap(leafs.begin(),leafs.end(),leaf);
             if(newl.value < pathMap[origin.row-1][origin.col])
                 pathMap[origin.row-1][origin.col] = newl.value;
         }
@@ -153,23 +155,25 @@ int main(){
     vector<LEAF> leafs;
     LEAF start = {0,0,0,0,0,0,0,0};
     leafs.push_back(start);
+    make_heap(leafs.begin(),leafs.end(),leaf);
 
     int count = 0;
     while(!leafs.empty() && pathMap[pathMap.size()-1][pathMap[0].size()-1] == INT32_MAX){
         count++;
-        updateLeaf(leafs,map,pathMap);
-        leafs.erase(leafs.begin(),leafs.begin()+1);
-        if(leafs.size() > 100000){
-            sort(leafs.begin(),leafs.end(),stepsSort);
-            leafs.erase(leafs.begin(),leafs.begin()+90000);
-            sort(leafs.begin(),leafs.end(),leaf);
-        }
-        //sort(leafs.begin(), leafs.end(),leaf);
-        //cout << leafs[0].value << endl;
-        if(count % 1000 == 0){
+        if(count%100000 == 0){
             cout << count << endl;
         }
+        if(count%500000 == 0){
+            out.clear();
+            outMap(pathMap,out);
+        }
+        updateLeaf(leafs,map,pathMap);
+        pop_heap(leafs.begin(),leafs.end(),leaf); leafs.pop_back();
     } 
+    if(leafs.empty()){
+        cout << "There are no more leafs" << endl;
+    }
+    cout << count << endl;
     outMap(pathMap,out);
     cout << pathMap[pathMap.size()-1][pathMap[0].size()-1] << endl;
     //printMap(pathMap);
