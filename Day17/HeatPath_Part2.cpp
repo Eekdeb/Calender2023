@@ -42,68 +42,99 @@ void updateLeaf(vector<leaf>& leafs, vector<vector<int>> map, unordered_set<int>
     leaf o = leafs.front(), newl;
     pop_heap(leafs.begin(),leafs.end(),leafSort); leafs.pop_back();
     //down
-    if(o.dir != 'U' && (o.dir != 'D' || (o.dir == 'D' && o.dirCount < 3)) && o.row != map.size()-1){
+    if(o.dir != 'U' && (o.dir != 'D' || (o.dir == 'D' && o.dirCount < 10)) && o.row != map.size()-1){
         newl = o;
-        if(o.dir == 'D')
+        if(o.dir == 'D'){
             newl.dirCount++;
-        else{
-            newl.dir = 'D';
-            newl.dirCount = 1;
+            newl.row++;
+            newl.heatLoss += map[newl.row][newl.col];
         }
-        newl.row++;
-        newl.heatLoss += map[newl.row][newl.col];
+        else if(o.row <= map.size()-5){
+            newl.dir = 'D';
+            //add all heat together of next 4 steps and move to that point.
+            newl.heatLoss += map[newl.row+1][newl.col];
+            newl.heatLoss += map[newl.row+2][newl.col];
+            newl.heatLoss += map[newl.row+3][newl.col];
+            newl.heatLoss += map[newl.row+4][newl.col];
+            newl.dirCount = 4;
+            newl.row += 4;
+        }
+        
         //check if it already exists.
         auto s = visited.insert(getHash(newl));
-        if(s.second){
+        if(newl.row != o.row && s.second){
             leafs.push_back(newl); push_heap(leafs.begin(),leafs.end(),leafSort);
         }
     }
     //Right
-    if(o.dir != 'L' && (o.dir != 'R' || (o.dir == 'R' && o.dirCount < 3)) && o.col != map[0].size()-1){
+    if(o.dir != 'L' && (o.dir != 'R' || (o.dir == 'R' && o.dirCount < 10)) && o.col != map[0].size()-1){
         newl = o;
-        if(o.dir == 'R')
+        if(o.dir == 'R'){
             newl.dirCount++;
-        else{
-            newl.dir = 'R';
-            newl.dirCount = 1;
+            newl.col++;
+            newl.heatLoss += map[newl.row][newl.col];
         }
-        newl.col++;
-        newl.heatLoss += map[newl.row][newl.col];
+        else if(o.col <= map[0].size()-5){
+            newl.dir = 'R';
+            //add all heat together of next 4 steps and move to that point.
+            newl.heatLoss += map[newl.row][newl.col+1];
+            newl.heatLoss += map[newl.row][newl.col+2];
+            newl.heatLoss += map[newl.row][newl.col+3];
+            newl.heatLoss += map[newl.row][newl.col+4];
+            newl.dirCount = 4;
+            newl.col += 4;
+        }
+
         auto s = visited.insert(getHash(newl));
-        if(s.second){
+        if(newl.col != o.col && s.second){
             leafs.push_back(newl); push_heap(leafs.begin(),leafs.end(),leafSort);
         }
     }
     //Upp
-    if(o.dir != 'D' && (o.dir != 'U' || (o.dir == 'U' && o.dirCount < 3)) && o.row != 0){
+    if(o.dir != 'D' && (o.dir != 'U' || (o.dir == 'U' && o.dirCount < 10)) && o.row != 0){
         newl = o;
-        if(o.dir == 'U')
+        if(o.dir == 'U'){
             newl.dirCount++;
-        else{
-            newl.dir = 'U';
-            newl.dirCount = 1;
+            newl.row--;
+            newl.heatLoss += map[newl.row][newl.col];
         }
-        newl.row--;
-        newl.heatLoss += map[newl.row][newl.col];
+        else if(o.row >= 4){
+            newl.dir = 'U';
+            //add all heat together of next 4 steps and move to that point.
+            newl.heatLoss += map[newl.row-1][newl.col];
+            newl.heatLoss += map[newl.row-2][newl.col];
+            newl.heatLoss += map[newl.row-3][newl.col];
+            newl.heatLoss += map[newl.row-4][newl.col];
+            newl.dirCount = 4;
+            newl.row -= 4;
+        }
         //check if it already exists.
         auto s = visited.insert(getHash(newl));
-        if(s.second){
+        if(newl.row != o.row && s.second){
             leafs.push_back(newl); push_heap(leafs.begin(),leafs.end(),leafSort);
         }
     }
     //Left
     if(o.dir != 'R' && (o.dir != 'L' || (o.dir == 'L' && o.dirCount < 3)) && o.col != 0){
         newl = o;
-        if(o.dir == 'L')
+        if(o.dir == 'L'){
             newl.dirCount++;
-        else{
+            newl.col--;
+            newl.heatLoss += map[newl.row][newl.col];
+        } 
+        else if(o.col >= 4){
             newl.dir = 'L';
-            newl.dirCount = 1;
+            //add all heat together of next 4 steps and move to that point.
+            newl.heatLoss += map[newl.row][newl.col-1];
+            newl.heatLoss += map[newl.row][newl.col-2];
+            newl.heatLoss += map[newl.row][newl.col-3];
+            newl.heatLoss += map[newl.row][newl.col-4];
+            newl.dirCount = 4;
+            newl.col -= 4;
         }
-        newl.col--;
-        newl.heatLoss += map[newl.row][newl.col];
+        
         auto s = visited.insert(getHash(newl));
-        if(s.second){
+        if(newl.col != o.col && s.second){
             leafs.push_back(newl); push_heap(leafs.begin(),leafs.end(),leafSort);
         }
     }
@@ -147,4 +178,5 @@ int main(){
         }
         updateLeaf(leafs,map,visited);
     }
+    cout << "end" << endl;
 }
