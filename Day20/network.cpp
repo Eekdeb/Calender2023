@@ -119,12 +119,8 @@ void pushButton(std::vector<packet>& queue){
 }
 
 int main(){
-    std::vector<packet> queue;
-    //std::shared_ptr<FlipFlop> flip = std::make_shared<FlipFlop>("Eek");
-
-    
-    //
-    std::map<std::string,std::shared_ptr<Module>> idToModule;
+    std::vector<packet> queue; //The queue with packets that are sent
+    std::map<std::string,std::shared_ptr<Module>> idToModule; //all Modules
 
     std::vector<std::string> receivers;
     std::vector<std::string> senders;
@@ -162,20 +158,4 @@ int main(){
         printPacket(queue[0]);
         queue.erase(queue.begin(),queue.begin()+1);
     }
-    
-    for (auto i : queue)
-    {
-        printPacket(i);
-    }
-    /*
-    std::map<std::string,std::shared_ptr<Module>> idToModule;
-    idToModule["broadcaster"] = flip;
-    pushButton(queue);
-    while (!queue.empty())
-    {
-        idToModule[queue[0].id]->send(queue[0],queue);
-        printPacket(queue[0]);
-        queue.erase(queue.begin(),queue.begin()+1);
-    }
-    */   
 }
