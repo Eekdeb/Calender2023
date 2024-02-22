@@ -22,7 +22,7 @@ class Module{
         
     public:
         std::vector<std::string> subs;
-
+        std::vector<std::string> receiving;
         Module(std::string thisId, std::vector<std::string> sendTo) {     // Constructor
             id = thisId;
             for (auto st : sendTo)
@@ -31,10 +31,21 @@ class Module{
             }           
         }
         virtual void send(packet,std::vector<packet>&) =0;
+        
+        void addReceiver(std::string resId){
+            receiving.push_back(resId);
+        }
+
         virtual std::string toString(){
             std::string str = id;
             str += " senders {";
             for (auto s : subs)
+            {
+                str += s;
+                str += " ";
+            }
+            str += "} R:{";
+            for (auto s : receiving)
             {
                 str += s;
                 str += " ";
@@ -49,28 +60,29 @@ class SingleLow: public Module{
         
     public:
         bool lowPacket = false;
-        int nrOfReceivedPackets = 0;
+        //int nrOfReceivedPackets = 1;
         SingleLow(std::string thisId, std::vector<std::string> ids):Module(thisId,ids){};
         void resetButton(){
             lowPacket = false;
-            nrOfReceivedPackets = 0;
+            //nrOfReceivedPackets = 0;
         }
         void send(packet received,std::vector<packet>& sending){
-            nrOfReceivedPackets++;
+            //nrOfReceivedPackets++;
             if(received.pulse == 0){
                 lowPacket = true;
             }
         };
         bool oneLowPulse(){
-            if(nrOfReceivedPackets == 1 && lowPacket){
-                return true;
-            }
-            return false;
+            return lowPacket;
+            //if(nrOfReceivedPackets == 1 && lowPacket){
+            //    return true;
+            //}
+            //return false;
         }
         std::string toString(){
            
             std::string str =  Module::toString();
-            str += std::to_string(nrOfReceivedPackets);
+            //str += std::to_string(nrOfReceivedPackets);
             return str;
         }
 };
@@ -221,6 +233,7 @@ int main(){
     {
         for (auto sub : m.second->subs) //For all subs on each module
         {
+            idToModule[sub]->addReceiver(m.first);
             for (auto conId : allConIds) //check if a con is a reciver to that module
             {
                 if(conId == sub){
@@ -228,31 +241,61 @@ int main(){
                         conPtr->addReceiver(m.first);
                     }
                 }
+                
             }
             
         }
         
     }
+
     
-    int highPulses = 0, lowPulses = 0;
-    for (int i = 0; i < 100000000; i++)
+    long long counter = 0;
+    while (true)
     {
+        counter++;
         pushButton(queue);
         while (!queue.empty())
         {
             //printPacket(queue[0]);
+            if(queue[0].sender == "vn"){
+                if(queue[0].pulse == 1){
+                    printPacket(queue[0]);
+                    std::cout << counter << std::endl;
+                }
+                
+            }
             if(idToModule[queue[0].receiver].use_count() != 0)
                 idToModule[queue[0].receiver]->send(queue[0],queue);
             queue.erase(queue.begin(),queue.begin()+1);
         }
         auto singPtr = std::dynamic_pointer_cast<SingleLow>(idToModule["rx"]);
         if(singPtr->oneLowPulse()){
-            std::cout << i;
+            std::cout << counter;
             break;
-        }else{
-            std::cout << singPtr->toString() << std::endl;
-            singPtr->resetButton();
-            
-        }   
+        }
     }
 }
+
+/**
+ * Manually found the the right answer.
+ * First got the graph that made it clear that there where 4 different groups
+ *  that all ended on one Conjunction each. There merge paths where (ph,kt,vn,hn).
+ *  When all of them are sending 1 the "rx" module is getting 0 therefor complete.
+ *  They all had a period that made them 1. (listed below)
+ * ph sends 1 every 3907 (prime)
+ * kt 4093 (prime)
+ * vn 3797 prime
+ * hn 4021 prime
+ *  To get the least number of times pressing the button is multiplying them
+ *  together becaus all of them are prime
+ *  Finale result is 244 151 741 342 687
+ * ________________________________________
+ * 
+ * How to make this automatically.
+ * Begin from the final module "rx" take a step back to the previous modules.
+ * Remember what this module needs for value and run the machine for 2s or something.
+ * If you can find a consistant loop remember it else go back one more step.
+ * Do so until all modules connected to rx has a loop. then find the lowest common nominate
+ * and you got the answer.
+ * 
+*/
