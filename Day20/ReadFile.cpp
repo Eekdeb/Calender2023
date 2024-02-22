@@ -44,6 +44,37 @@ class Module{
         };
 };
 
+class SingleLow: public Module{
+    private:
+        
+    public:
+        bool lowPacket = false;
+        int nrOfReceivedPackets = 0;
+        SingleLow(std::string thisId, std::vector<std::string> ids):Module(thisId,ids){};
+        void resetButton(){
+            lowPacket = false;
+            nrOfReceivedPackets = 0;
+        }
+        void send(packet received,std::vector<packet>& sending){
+            nrOfReceivedPackets++;
+            if(received.pulse == 0){
+                lowPacket = true;
+            }
+        };
+        bool oneLowPulse(){
+            if(nrOfReceivedPackets == 1 && lowPacket){
+                return true;
+            }
+            return false;
+        }
+        std::string toString(){
+           
+            std::string str =  Module::toString();
+            str += std::to_string(nrOfReceivedPackets);
+            return str;
+        }
+};
+
 class Broadcaster: public Module{
     public:
         Broadcaster(std::string thisId, std::vector<std::string> ids):Module(thisId,ids){};
@@ -182,6 +213,9 @@ int main(){
     {
         getLineModule(input,idToModule,allConIds);
     }
+    
+    std::shared_ptr<SingleLow> low = std::make_shared<SingleLow>("rx",std::vector<std::string>());
+    idToModule["rx"] = low;
 
     for (auto m : idToModule) //for all modules
     {
@@ -201,7 +235,7 @@ int main(){
     }
     
     int highPulses = 0, lowPulses = 0;
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 100000000; i++)
     {
         pushButton(queue);
         while (!queue.empty())
@@ -209,13 +243,16 @@ int main(){
             //printPacket(queue[0]);
             if(idToModule[queue[0].receiver].use_count() != 0)
                 idToModule[queue[0].receiver]->send(queue[0],queue);
-            if(queue[0].pulse == 0){
-                lowPulses++;
-            }else
-                highPulses++;
             queue.erase(queue.begin(),queue.begin()+1);
         }
-        std::cout << i << " " << lowPulses << " " << highPulses << std::endl;
+        auto singPtr = std::dynamic_pointer_cast<SingleLow>(idToModule["rx"]);
+        if(singPtr->oneLowPulse()){
+            std::cout << i;
+            break;
+        }else{
+            std::cout << singPtr->toString() << std::endl;
+            singPtr->resetButton();
+            
+        }   
     }
-    std::cout << highPulses*lowPulses << std::endl;
 }
